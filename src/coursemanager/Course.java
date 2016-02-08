@@ -32,6 +32,11 @@ public class Course {
         return this.credits;
     }
     
+    @Override
+    public String toString() {
+        return this.id + " " + this.title;
+    }
+    
     /*
     public void setId(String id) {
         this.id = id;

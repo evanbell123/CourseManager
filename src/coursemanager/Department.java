@@ -24,8 +24,24 @@ public class Department {
         this.courses = new LinkedList<>();
     }
     
+    public String getId() {
+        return this.id;
+    }
+    
     public LinkedList<Course> getCourses() {
         return this.courses;
+    }
+    
+    public LinkedList<String> getCourseInfo() {
+        LinkedList<String> courseInfo = new LinkedList<>();
+        Course temp;
+        ListIterator<Course> courseIter = courses.listIterator();
+        while (courseIter.hasNext()) {
+            temp = courseIter.next();
+            courseInfo.add(this.id + temp.toString());
+        }
+        
+        return courseInfo;
     }
 
     /*
@@ -40,9 +56,7 @@ public class Department {
         if (errors.size() == 0) {
             courses.add(new Course(id, title, credits));
         }
-        
         return errors;
-        
     }
     
     private LinkedList<String> inputValidation(String id, String title, int credits) {
