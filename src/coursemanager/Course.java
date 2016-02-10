@@ -10,9 +10,9 @@ package coursemanager;
  * @author Evan
  */
 public class Course {
-    private String id;
-    private String title;
-    private int credits;
+    private final String id;
+    private final String title;
+    private final int credits;
     
     public Course(String id, String title, int credits) {
         this.id = id;

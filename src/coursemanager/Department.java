@@ -6,7 +6,6 @@
 package coursemanager;
 
 import java.util.LinkedList;
-import java.util.ListIterator;
 
 /**
  *
@@ -23,70 +22,18 @@ public class Department {
         this.name = name;
         this.courses = new LinkedList<>();
     }
-    
+
     public String getId() {
         return this.id;
     }
-    
+
     public LinkedList<Course> getCourses() {
         return this.courses;
     }
-    
-    public LinkedList<String> getCourseInfo() {
-        LinkedList<String> courseInfo = new LinkedList<>();
-        Course temp;
-        ListIterator<Course> courseIter = courses.listIterator();
-        while (courseIter.hasNext()) {
-            temp = courseIter.next();
-            courseInfo.add(this.id + temp.toString());
-        }
-        
-        return courseInfo;
+
+    public void add(String id, String title, int credits) {
+        courses.add(new Course(id, title, credits));
+
     }
 
-    /*
-     Description: Add a new course to the department if user input is valid.
-     Input: The id, title, and credits of the new course
-     Output: A linked list of user input errors
-     */
-    public LinkedList<String> add(String id, String title, int credits) {
-
-        LinkedList<String> errors = this.inputValidation(id, title, credits);
-        
-        if (errors.size() == 0) {
-            courses.add(new Course(id, title, credits));
-        }
-        return errors;
-    }
-    
-    private LinkedList<String> inputValidation(String id, String title, int credits) {
-        LinkedList<String> errors = new LinkedList<>();
-        if (id.length() > 0) {
-            if (title.length() > 0) {
-                if (credits > 0 && credits < 5) {
-                    /*
-                     Check for duplicate id and duplicate name
-                     */
-                    Course temp;
-                    ListIterator<Course> courseIter = courses.listIterator();
-                    while (courseIter.hasNext()) {
-                        temp = courseIter.next();
-                        if (temp.getId().equals(id)) {
-                            errors.add("The course ID '" + id + "' already exists");
-                        }
-                        if (temp.getTitle().equals(title)) {
-                            errors.add("The course name '" + title + "' is already taken");
-                        }
-                    }
-                } else { //credits > 0 && credits < 5
-                    errors.add("Credits must be greater than 0 and less than 5");
-                }
-            } else { //title.length() > 0
-                errors.add("Please enter a name for this course");
-            }
-        } else { //id.length() > 0
-            errors.add("Please enter an ID for this course");
-        }
-        return errors;
-    }
 }

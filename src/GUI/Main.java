@@ -9,7 +9,6 @@ import coursemanager.Course;
 import coursemanager.Department;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,15 +39,10 @@ import javax.swing.WindowConstants;
  */
 public class Main extends JFrame {
 
-    Department cs = new Department("CS", "Computer Science");
-    Department zo = new Department("ZO", "Zoology");
-    Department ch = new Department("CH", "Chemistry");
-
     private static final List<Department> departments = new ArrayList<>();
-    private static final List<Course> courses = new ArrayList<>();
 
     private static final DefaultComboBoxModel deptIDs = new DefaultComboBoxModel();
-    private static final DefaultListModel courseInfo = new DefaultListModel();
+    private static final DefaultListModel courseListModel = new DefaultListModel();
 
     //private static final List<Course> courses = new ArrayList<>();
     private final JLabel codeLabel = new JLabel("Course Code:");
@@ -67,23 +61,20 @@ public class Main extends JFrame {
     private final JButton displayDeptButton = new JButton("Display (dept)");
 
     private JList courseList;
-    
+
     public Main() {
 
         setDepartments();
 
-        setCourses();
+        courseList = new JList(courseListModel);
 
         displayAll();
 
         setDeptComboBox();
 
-        setCourses();
-
         prepareGUI();
 
         displayDeptButton.addActionListener((ActionEvent e) -> {
-            //JOptionPane.showMessageDialog(null, "Display Department Button");
             filterByDepartment((String) deptComboBox.getSelectedItem());
         });
 
@@ -92,84 +83,143 @@ public class Main extends JFrame {
         });
 
         addCourseButton.addActionListener((ActionEvent e) -> {
-            addCourse((String) deptComboBox.getSelectedItem(), codeTextField.getText(), nameTextField.getText(), Integer.parseInt(creditsTextField.getText()));
-            //JOptionPane.showMessageDialog(null, "Add Course Button");
+            addCourse((String) deptComboBox.getSelectedItem(), codeTextField.getText(), nameTextField.getText(), creditsTextField.getText());
         });
     }
-    
+
     private void setDepartments() {
         LinkedList<String> errors = new LinkedList<>();
 
-        errors = cs.add("404", "Object-Oriented Programming", 3);
-        errors = cs.add("403", "Algorithms and Complexities", 3);
+        Department cs = new Department("CS", "Computer Science");
+        Department zo = new Department("ZO", "Zoology");
+        Department ch = new Department("CH", "Chemistry");
 
-        errors = zo.add("404", "Animals", 3);
-        errors = zo.add("403", "Plants", 3);
+        cs.add("404", "Object-Oriented Programming", 3);
+        cs.add("403", "Algorithms and Complexities", 3);
 
-        errors = ch.add("404", "Atoms", 3);
-        errors = ch.add("403", "Chemicals", 3);
+        zo.add("404", "Animals", 3);
+        zo.add("403", "Plants", 3);
+
+        ch.add("404", "Atoms", 3);
+        ch.add("403", "Chemicals", 3);
 
         departments.add(cs);
         departments.add(zo);
         departments.add(ch);
     }
 
-    private void setCourses() {
-
+    private Department findDeptByID(String id) {
         ListIterator<Department> deptIter = departments.listIterator();
+        Department temp;
         while (deptIter.hasNext()) {
-            courses.addAll(deptIter.next().getCourses());
+            temp = deptIter.next();
+            if (temp.getId().equals(id)) {
+                return temp;
+            }
         }
+
+        return null;
     }
 
     private void displayAll() {
-        courseInfo.removeAllElements();
+        courseListModel.removeAllElements();
 
-        ListIterator<Course> courseIter = courses.listIterator();
-        while (courseIter.hasNext()) {
-            courseInfo.addElement(courseIter.next().toString());
+        ListIterator<Department> deptIter = departments.listIterator();
+
+        Department dept;
+        while (deptIter.hasNext()) {
+            dept = deptIter.next();
+            for (Course course : dept.getCourses()) {
+                courseListModel.addElement(dept.getId() + course.toString());
+            }
         }
 
-        courseList = new JList(courseInfo);
+        courseList = new JList(courseListModel);
     }
 
     private void displayDept(Department dept) {
-        courseInfo.removeAllElements();
+        courseListModel.removeAllElements();
 
         ListIterator<Course> courseIter = dept.getCourses().listIterator();
         while (courseIter.hasNext()) {
-            courseInfo.addElement(courseIter.next().toString());
+            courseListModel.addElement(dept.getId() + courseIter.next().toString());
         }
 
-        courseList = new JList(courseInfo);
+        courseList = new JList(courseListModel);
     }
 
-    private void addCourse(String deptID, String courseID, String title, int credits) {
-        LinkedList<String> errors = new LinkedList<>();
-        
-        switch (deptID) {
-            case "CS":
-                errors = cs.add(courseID, title, credits);
+    private void addCourse(String deptID, String courseID, String title, String credits) {
 
-                break;
-            case "ZO":
-                errors = zo.add(courseID, title, credits);
-                break;
-            case "CH":
-                errors = ch.add(courseID, title, credits);
-                break;
-            default:
-                
-                break;
-        }
-        if (errors.size() > 0) {
+        //LinkedList<String> errors = findDeptByID(deptID).add(courseID, title, credits);
+        LinkedList<String> errors = inputValidation(deptID, courseID, title, credits);
+
+        if (!errors.isEmpty()) {
             displayErrors(errors);
         } else {
-            
             JOptionPane.showMessageDialog(null, "Course Added");
-            courseInfo.addElement(title);
+            findDeptByID(deptID).add(courseID, title, Integer.parseInt(credits));
+            displayAll();
         }
-        
+
+    }
+
+    /*
+    http://stackoverflow.com/questions/5439529/determine-if-a-string-is-an-integer-in-java
+     */
+    private LinkedList<String> inputValidation(String deptID, String id, String title, String credits) {
+        LinkedList<String> errors = new LinkedList<>();
+
+        if (id.isEmpty()) {
+            errors.add("Please enter an ID for this course");
+        }
+
+        if (title.isEmpty()) {
+            errors.add("Please enter a title for this course");
+        }
+
+        if (credits.isEmpty()) {
+            errors.add("Please enter the number of credit hours for this course");
+        } else if (!credits.matches("^-?\\d+$")) { // if credits is not an integer value
+            errors.add("Credits must be an integer value");
+        } else {
+            int intCredits = Integer.parseInt(credits);
+            if (intCredits > 0 && intCredits < 5) {
+
+            } else { //credits > 0 && credits < 5
+                errors.add("Credits must be greater than 0 and less than 5");
+            }
+        }
+
+        if (!id.isEmpty() && !title.isEmpty()) {
+            /*
+                     Check for duplicate id and/or duplicate name
+             */
+            ListIterator<Department> deptIter = departments.listIterator();
+
+            Department dept;
+            while (deptIter.hasNext()) {
+                dept = deptIter.next();
+                for (Course course : dept.getCourses()) {
+                    /*
+                    check for duplicate course id within department
+                     */
+                    if (dept.getId().equals(deptID)) {
+                        if (course.getId().equals(id)) {
+                            errors.add("The course ID '" + id + "' already exists");
+                        }
+                    }
+
+                    /*
+                    check for duplicate course title within all courses
+                     */
+                    if (course.getTitle().equals(title)) {
+                        errors.add("The course name '" + title + "' is already taken");
+                    }
+                }
+            }
+        }
+
+        return errors;
     }
 
     private void setDeptComboBox() {
@@ -189,14 +239,14 @@ public class Main extends JFrame {
 
         //courseList = new JList(filteredDept.toArray());
     }
-    
+
     private static void displayErrors(LinkedList<String> errors) {
         String errorMessage = "";
         ListIterator<String> errorIter = errors.listIterator();
         while (errorIter.hasNext()) {
             errorMessage += errorIter.next() + "\n";
         }
-        
+
         JOptionPane.showMessageDialog(null, errorMessage);
     }
 
@@ -219,8 +269,6 @@ public class Main extends JFrame {
         //layout.setVisible(true);
         //layout.setSize(400,400);
     }
-    
-    
 
     private void prepareGUI() {
 
@@ -285,11 +333,5 @@ public class Main extends JFrame {
         pack();
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
-
-    
-
-    
-
-    
 
 }
