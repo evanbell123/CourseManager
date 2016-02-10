@@ -37,7 +37,7 @@ import javax.swing.WindowConstants;
  *
  * @author Evan
  */
-public class Main extends JFrame {
+public class Controller extends JFrame {
 
     private static final List<Department> departments = new ArrayList<>();
 
@@ -62,7 +62,7 @@ public class Main extends JFrame {
 
     private JList courseList;
 
-    public Main() {
+    public Controller() {
 
         setDepartments();
 
@@ -263,7 +263,7 @@ public class Main extends JFrame {
                 //UIManager.getCrossPlatformLookAndFeelClassName());
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
             }
-            new Main().setVisible(true);
+            new Controller().setVisible(true);
         });
 
         //layout.setVisible(true);
