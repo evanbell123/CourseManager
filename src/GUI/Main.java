@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -41,6 +40,10 @@ import javax.swing.WindowConstants;
  */
 public class Main extends JFrame {
 
+    Department cs = new Department("CS", "Computer Science");
+    Department zo = new Department("ZO", "Zoology");
+    Department ch = new Department("CH", "Chemistry");
+
     private static final List<Department> departments = new ArrayList<>();
     private static final List<Course> courses = new ArrayList<>();
 
@@ -64,7 +67,7 @@ public class Main extends JFrame {
     private final JButton displayDeptButton = new JButton("Display (dept)");
 
     private JList courseList;
-
+    
     public Main() {
 
         setDepartments();
@@ -89,22 +92,20 @@ public class Main extends JFrame {
         });
 
         addCourseButton.addActionListener((ActionEvent e) -> {
-            JOptionPane.showMessageDialog(null, "Add Course Button");
+            addCourse((String) deptComboBox.getSelectedItem(), codeTextField.getText(), nameTextField.getText(), Integer.parseInt(creditsTextField.getText()));
+            //JOptionPane.showMessageDialog(null, "Add Course Button");
         });
     }
-
+    
     private void setDepartments() {
         LinkedList<String> errors = new LinkedList<>();
 
-        Department cs = new Department("CS", "Computer Science");
         errors = cs.add("404", "Object-Oriented Programming", 3);
         errors = cs.add("403", "Algorithms and Complexities", 3);
 
-        Department zo = new Department("ZO", "Zoology");
         errors = zo.add("404", "Animals", 3);
         errors = zo.add("403", "Plants", 3);
 
-        Department ch = new Department("CH", "Chemistry");
         errors = ch.add("404", "Atoms", 3);
         errors = ch.add("403", "Chemicals", 3);
 
@@ -143,6 +144,34 @@ public class Main extends JFrame {
         courseList = new JList(courseInfo);
     }
 
+    private void addCourse(String deptID, String courseID, String title, int credits) {
+        LinkedList<String> errors = new LinkedList<>();
+        
+        switch (deptID) {
+            case "CS":
+                errors = cs.add(courseID, title, credits);
+
+                break;
+            case "ZO":
+                errors = zo.add(courseID, title, credits);
+                break;
+            case "CH":
+                errors = ch.add(courseID, title, credits);
+                break;
+            default:
+                
+                break;
+        }
+        if (errors.size() > 0) {
+            displayErrors(errors);
+        } else {
+            
+            JOptionPane.showMessageDialog(null, "Course Added");
+            courseInfo.addElement(title);
+        }
+        
+    }
+
     private void setDeptComboBox() {
 
         ListIterator<Department> deptIter = departments.listIterator();
@@ -159,6 +188,16 @@ public class Main extends JFrame {
         displayDept(filteredDept.get(0));
 
         //courseList = new JList(filteredDept.toArray());
+    }
+    
+    private static void displayErrors(LinkedList<String> errors) {
+        String errorMessage = "";
+        ListIterator<String> errorIter = errors.listIterator();
+        while (errorIter.hasNext()) {
+            errorMessage += errorIter.next() + "\n";
+        }
+        
+        JOptionPane.showMessageDialog(null, errorMessage);
     }
 
     /**
@@ -180,6 +219,8 @@ public class Main extends JFrame {
         //layout.setVisible(true);
         //layout.setSize(400,400);
     }
+    
+    
 
     private void prepareGUI() {
 
@@ -245,11 +286,10 @@ public class Main extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
-    private static void displayErrors(LinkedList<String> errors) {
-        ListIterator<String> errorIter = errors.listIterator();
-        while (errorIter.hasNext()) {
-            System.out.println(errorIter.next());
-        }
-    }
+    
+
+    
+
+    
 
 }
