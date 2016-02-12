@@ -104,7 +104,7 @@ public class Controller {
 
     public List<String> addCourse(String deptID, String courseID, String title, String credits) {
 
-        List<String> errors = inputValidation(deptID, courseID, title, credits);
+        List<String> errors = addCourseInputValidation(deptID, courseID, title, credits);
 
         if (errors.isEmpty()) {
             findDeptByID(deptID).addCourse(courseID, title, Integer.parseInt(credits));
@@ -113,10 +113,21 @@ public class Controller {
         return errors;
     }
 
-    /*
-    http://stackoverflow.com/questions/5439529/determine-if-a-string-is-an-integer-in-java
-     */
-    private List<String> inputValidation(String deptID, String id, String title, String credits) {
+    public List<String> editCourse(String oldDeptID, String newDeptID, String oldCourseID, String newCourseID, String oldTitle, String newTitle, String credits) {
+
+        List<String> errors = editCourseInputValidation(oldDeptID, newDeptID, oldCourseID, newCourseID, oldTitle, newTitle, credits);
+
+        if (errors.isEmpty()) {
+            //findDeptByID(deptID).addCourse(courseID, title, Integer.parseInt(credits));
+            if (oldDeptID.equals(newDeptID)) {
+                findDeptByID(oldDeptID).editCourse(oldCourseID, newCourseID, newTitle, credits);
+            }
+        }
+
+        return errors;
+    }
+
+    private List<String> generalInputValidation(String id, String title, String credits) {
         List<String> errors = new ArrayList<>();
 
         if (id.isEmpty()) {
@@ -140,7 +151,16 @@ public class Controller {
             }
         }
 
-        if (!id.isEmpty() && !title.isEmpty()) {
+        return errors;
+    }
+
+    /*
+    http://stackoverflow.com/questions/5439529/determine-if-a-string-is-an-integer-in-java
+     */
+    private List<String> addCourseInputValidation(String deptID, String courseID, String title, String credits) {
+        List<String> errors = generalInputValidation(courseID, title, credits);
+
+        if (!courseID.isEmpty() && !title.isEmpty()) {
             /*
                      Check for duplicate id and/or duplicate name
              */
@@ -154,8 +174,8 @@ public class Controller {
                     check for duplicate course id within department
                      */
                     if (dept.getId().equals(deptID)) {
-                        if (course.getId().equals(id)) {
-                            errors.add("The course ID '" + id + "' already exists");
+                        if (course.getId().equals(courseID)) {
+                            errors.add("The course ID '" + courseID + "' already exists");
                         }
                     }
 
@@ -167,6 +187,52 @@ public class Controller {
                     }
                 }
             }
+        }
+
+        return errors;
+    }
+
+    private List<String> editCourseInputValidation(String oldDeptID, String newDeptID, String oldCourseID, String newCourseID, String oldTitle, String newTitle, String credits) {
+
+        List<String> errors = generalInputValidation(newCourseID, newTitle, credits);
+
+        if (!newCourseID.isEmpty() && !newTitle.isEmpty()) {
+            /*
+                     Check for duplicate id and/or duplicate name
+             */
+
+            if (!oldDeptID.equals(newDeptID)) {
+                /*
+                     Check for duplicate id and/or duplicate name
+                 */
+                ListIterator<Department> deptIter = departments.listIterator();
+
+                Department dept;
+                while (deptIter.hasNext()) {
+                    dept = deptIter.next();
+                    for (Course course : dept.getCourses()) {
+                        /*
+                    check for duplicate course id within department
+                         */
+                        if (dept.getId().equals(deptID)) {
+                            if (course.getId().equals(courseID)) {
+                                errors.add("The course ID '" + courseID + "' already exists");
+                            }
+                        }
+
+                        /*
+                    check for duplicate course title within all courses
+                         */
+                        if (course.getTitle().equals(title)) {
+                            errors.add("The course name '" + title + "' is already taken");
+                        }
+                    }
+                }
+            }
+
+            ListIterator<Department> deptIter = departments.listIterator();
+
+            Department dept;
         }
 
         return errors;
@@ -185,12 +251,12 @@ public class Controller {
     }
 
     public List<String> parseCourseString(String courseString) {
-        
+
         //This string contains the depart id and course id
         String ids = courseString.substring(0, courseString.indexOf(' '));
         String courseTitle = courseString.substring(courseString.indexOf(' ') + 1);
         //This string contains the course title
-        
+
         List<String> courseListString = new ArrayList<>();
         courseListString.add(ids.substring(0, 2)); //deptID
         courseListString.add(ids.substring(2)); //courseID

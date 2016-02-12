@@ -37,6 +37,11 @@ public class Department {
         courses.add(new Course(id, title, credits));
     }
     
+    public void editCourse(String oldID, String newID, String title, String credits) {
+        Course temp = findCourseByID(oldID);
+        temp.edit(newID, title, Integer.parseInt(credits));
+    }
+    
     public Course findCourseByID(String courseID) {
         
         

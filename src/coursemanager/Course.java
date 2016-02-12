@@ -9,15 +9,13 @@ package coursemanager;
  *
  * @author Evan
  */
-public class Course {
-    private final String id;
-    private final String title;
-    private final int credits;
+public final class Course {
+    private String id;
+    private String title;
+    private int credits;
     
     public Course(String id, String title, int credits) {
-        this.id = id;
-        this.title = title;
-        this.credits = credits;
+        edit(id, title, credits);
     }
     
     public String getId() {
@@ -30,6 +28,12 @@ public class Course {
     
     public int getCredits() {
         return this.credits;
+    }
+    
+    public void edit(String id, String title, int credits) {
+        this.id = id;
+        this.title = title;
+        this.credits = credits;
     }
     
     @Override

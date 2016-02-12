@@ -74,9 +74,9 @@ public class CMFrame extends JFrame {
             public void valueChanged(ListSelectionEvent e) {
 
                 if (!e.getValueIsAdjusting()) {
-                    
+
                     List<String> courseValues = controller.parseCourseString(courseList.getSelectedValue().toString());
-                    
+
                     deptComboBox.setSelectedItem(courseValues.get(0));
                     codeTextField.setText(courseValues.get(1));
                     titleTextField.setText(courseValues.get(2));
@@ -91,19 +91,16 @@ public class CMFrame extends JFrame {
         //setDeptComboBox();
         prepareGUI();
 
-        displayDeptButton.addActionListener(
-                new ActionListener() {
+        displayDeptButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e
-            ) {
+            public void actionPerformed(ActionEvent e) {
                 String deptID = (String) deptComboBox.getSelectedItem();
                 updateCourseList(controller.filterByDept(deptID));
             }
         }
         );
 
-        displayAllButton.addActionListener(
-                new ActionListener() {
+        displayAllButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e
             ) {
@@ -112,21 +109,45 @@ public class CMFrame extends JFrame {
         }
         );
 
-        addCourseButton.addActionListener((ActionEvent e) -> {
-                    DefaultListModel listModel = (DefaultListModel) courseList.getModel();
-                    listModel.removeAllElements();
-                    List<String> errors = controller.addCourse((String) deptComboBox.getSelectedItem(), codeTextField.getText(), titleTextField.getText(), creditsTextField.getText());
+        addCourseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<String> errors = controller.addCourse((String) deptComboBox.getSelectedItem(), codeTextField.getText(), titleTextField.getText(), creditsTextField.getText());
 
-                    if (errors.isEmpty()) {
-                        JOptionPane.showMessageDialog(null, "Course Added");
-                    } else {
-                        displayErrors(errors);
-                    }
-
-                    updateCourseList(controller.getCourses());
-
+                if (errors.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Course Added");
+                } else {
+                    displayErrors(errors);
                 }
-        );
+
+                updateCourseList(controller.getCourses());
+            }
+        });
+
+        editCourseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                List<String> courseValues = controller.parseCourseString(courseList.getSelectedValue().toString());
+                
+                List<String> errors = controller.editCourse(
+                        courseValues.get(0),
+                        (String) deptComboBox.getSelectedItem(),
+                        courseValues.get(1),
+                        codeTextField.getText(),
+                        courseValues.get(2),
+                        titleTextField.getText(),
+                        creditsTextField.getText());
+
+                if (errors.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Course Added");
+                } else {
+                    displayErrors(errors);
+                }
+
+                updateCourseList(controller.getCourses());
+            }
+        });
     }
 
     private void updateCourseList(List<String> courses) {
