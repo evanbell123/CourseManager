@@ -28,6 +28,10 @@ public class Department {
     public String getId() {
         return this.id;
     }
+    
+    public String getName() {
+        return this.name;
+    }
 
     public List<Course> getCourses() {
         return this.courses;
@@ -40,6 +44,10 @@ public class Department {
     public void editCourse(String oldID, String newID, String title, String credits) {
         Course temp = findCourseByID(oldID);
         temp.edit(newID, title, Integer.parseInt(credits));
+    }
+    
+    public void deleteCourse(String id) {
+        courses.remove(findCourseByID(id));
     }
     
     public Course findCourseByID(String courseID) {

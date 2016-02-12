@@ -118,11 +118,25 @@ public class Controller {
         List<String> errors = editCourseInputValidation(oldDeptID, newDeptID, oldCourseID, newCourseID, oldTitle, newTitle, credits);
 
         if (errors.isEmpty()) {
-            //findDeptByID(deptID).addCourse(courseID, title, Integer.parseInt(credits));
-            if (oldDeptID.equals(newDeptID)) {
-                findDeptByID(oldDeptID).editCourse(oldCourseID, newCourseID, newTitle, credits);
-            }
+            findDeptByID(oldDeptID).editCourse(oldCourseID, newCourseID, newTitle, credits);
         }
+
+        return errors;
+    }
+
+    public List<String> deleteCourse(String deptID, String courseID) {
+        
+        List<String> errors = new ArrayList<>();
+        
+        Department temp = findDeptByID(deptID);
+        
+        if (temp.findCourseByID(courseID) != null) {
+            findDeptByID(deptID).deleteCourse(courseID);
+        } else {
+            errors.add("This course doesn't exist");
+        }
+        
+        
 
         return errors;
     }
@@ -155,14 +169,14 @@ public class Controller {
     }
 
     /*
-    http://stackoverflow.com/questions/5439529/determine-if-a-string-is-an-integer-in-java
+     http://stackoverflow.com/questions/5439529/determine-if-a-string-is-an-integer-in-java
      */
     private List<String> addCourseInputValidation(String deptID, String courseID, String title, String credits) {
         List<String> errors = generalInputValidation(courseID, title, credits);
 
         if (!courseID.isEmpty() && !title.isEmpty()) {
             /*
-                     Check for duplicate id and/or duplicate name
+             Check for duplicate id and/or duplicate name
              */
             ListIterator<Department> deptIter = departments.listIterator();
 
@@ -171,16 +185,15 @@ public class Controller {
                 dept = deptIter.next();
                 for (Course course : dept.getCourses()) {
                     /*
-                    check for duplicate course id within department
+                     check for duplicate course id within department
                      */
-                    if (dept.getId().equals(deptID)) {
-                        if (course.getId().equals(courseID)) {
-                            errors.add("The course ID '" + courseID + "' already exists");
-                        }
+                    if (dept.getId().equals(deptID) && course.getId().equals(courseID)) {
+                        errors.add("The course ID '" + courseID + "' already exists");
+
                     }
 
                     /*
-                    check for duplicate course title within all courses
+                     check for duplicate course title within all courses
                      */
                     if (course.getTitle().equals(title)) {
                         errors.add("The course name '" + title + "' is already taken");
@@ -196,14 +209,14 @@ public class Controller {
 
         List<String> errors = generalInputValidation(newCourseID, newTitle, credits);
 
-        if (!newCourseID.isEmpty() && !newTitle.isEmpty()) {
-            /*
-                     Check for duplicate id and/or duplicate name
-             */
+        if (!oldDeptID.equals(newDeptID)) {
+            errors.add("You can't change a courses department");
+        }
 
-            if (!oldDeptID.equals(newDeptID)) {
+        if (!newCourseID.isEmpty() && !newTitle.isEmpty()) {
+            if (!oldDeptID.equals(newDeptID) || !oldTitle.equals(newTitle) || !oldCourseID.equals(newCourseID)) {
                 /*
-                     Check for duplicate id and/or duplicate name
+                 Check for duplicate id and/or duplicate name
                  */
                 ListIterator<Department> deptIter = departments.listIterator();
 
@@ -212,19 +225,17 @@ public class Controller {
                     dept = deptIter.next();
                     for (Course course : dept.getCourses()) {
                         /*
-                    check for duplicate course id within department
+                         check for duplicate course id within department
                          */
-                        if (dept.getId().equals(deptID)) {
-                            if (course.getId().equals(courseID)) {
-                                errors.add("The course ID '" + courseID + "' already exists");
-                            }
+                        if (dept.getId().equals(newDeptID) && course.getId().equals(newCourseID) && !oldCourseID.equals(newCourseID)) {
+                            errors.add("The course ID '" + newCourseID + "' already exists in the " + dept.getName() + " department");
                         }
 
                         /*
-                    check for duplicate course title within all courses
+                         check for duplicate course title within all courses
                          */
-                        if (course.getTitle().equals(title)) {
-                            errors.add("The course name '" + title + "' is already taken");
+                        if (course.getTitle().equals(newTitle) && !oldTitle.equals(newTitle)) {
+                            errors.add("The course name '" + newTitle + "' is already taken");
                         }
                     }
                 }
