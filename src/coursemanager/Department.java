@@ -5,7 +5,9 @@
  */
 package coursemanager;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  *
@@ -15,25 +17,39 @@ public class Department {
 
     private final String id;
     private final String name;
-    private final LinkedList<Course> courses;
+    private final List<Course> courses;
 
     public Department(String id, String name) {
         this.id = id;
         this.name = name;
-        this.courses = new LinkedList<>();
+        this.courses = new ArrayList<>();
     }
 
     public String getId() {
         return this.id;
     }
 
-    public LinkedList<Course> getCourses() {
+    public List<Course> getCourses() {
         return this.courses;
     }
 
-    public void add(String id, String title, int credits) {
+    public void addCourse(String id, String title, int credits) {
         courses.add(new Course(id, title, credits));
-
     }
-
+    
+    public Course findCourseByID(String courseID) {
+        
+        
+        ListIterator<Course> courseIter = courses.listIterator();
+        Course temp;
+        while (courseIter.hasNext()) {
+            temp = courseIter.next();
+            if (temp.getId().equals(courseID)) {
+                
+                return temp;
+            }
+        }
+        
+        return null;
+    }
 }
