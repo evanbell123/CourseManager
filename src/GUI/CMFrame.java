@@ -109,8 +109,7 @@ public class CMFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 updateCourseList(controller.getCourses());
             }
-        }
-        );
+        });
 
         addCourseButton.addActionListener(new ActionListener() {
             @Override
