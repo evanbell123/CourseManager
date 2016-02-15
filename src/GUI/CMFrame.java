@@ -258,7 +258,7 @@ public class CMFrame extends JFrame {
         );
 
         //layout.linkSize(SwingConstants.HORIZONTAL, codeLabel);
-        setTitle("Find");
+        setTitle("Course Manager");
         pack();
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
